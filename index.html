@@ -367,8 +367,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 // ============================================================
 // STATE
 // ============================================================
-let API_KEY = '';
-let ROOT_FOLDER_ID = '';
+let API_KEY = 'AIzaSyDiwFz7Yq5xWBsmZFQ0-0X7lm2K5R_bekw';
+let ROOT_FOLDER_ID = '1WAAHfkuYPASTIpwrd32qfxOcXoxJHz3t';
 let learned = {};          // fileId -> true
 let allFiles = {};         // fileId -> {id,name,mimeType,...}
 let currentFolderId = '';
@@ -387,13 +387,10 @@ const PDF_TYPE = 'application/pdf';
 // STORAGE
 // ============================================================
 function saveState() {
-  localStorage.setItem('bhv_key', API_KEY);
-  localStorage.setItem('bhv_root', ROOT_FOLDER_ID);
   localStorage.setItem('bhv_learned', JSON.stringify(learned));
 }
 function loadState() {
-  API_KEY = localStorage.getItem('bhv_key') || '';
-  ROOT_FOLDER_ID = localStorage.getItem('bhv_root') || '';
+  // API_KEY và ROOT_FOLDER_ID đã được cài sẵn
   try { learned = JSON.parse(localStorage.getItem('bhv_learned') || '{}'); } catch { learned = {}; }
 }
 
@@ -755,14 +752,9 @@ function escHtml(s) { return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;'
 // INIT
 // ============================================================
 loadState();
-if (API_KEY && ROOT_FOLDER_ID) {
-  document.getElementById('mainApp').style.display = 'flex';
-  document.getElementById('setupOverlay').style.display = 'none';
-  navigateTo(ROOT_FOLDER_ID, 'Thư mục gốc', true);
-} else {
-  document.getElementById('setupOverlay').style.display = 'flex';
-  document.getElementById('mainApp').style.display = 'none';
-}
+document.getElementById('mainApp').style.display = 'flex';
+document.getElementById('setupOverlay').style.display = 'none';
+navigateTo(ROOT_FOLDER_ID, 'Thư mục gốc', true);
 </script>
 </body>
 </html>
