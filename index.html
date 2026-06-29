@@ -220,20 +220,26 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 
 .viewer-nav{
   position:absolute;bottom:0;left:0;right:0;
-  padding:1rem 1.5rem;
-  background:linear-gradient(transparent,rgba(0,0,0,0.6));
-  display:flex;align-items:center;justify-content:center;gap:16px;
+  padding:1.25rem 1.5rem 1.5rem;
+  background:linear-gradient(transparent,rgba(0,0,0,0.75));
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  flex-wrap:wrap;
 }
 .vnav-btn{
-  width:50px;height:50px;border-radius:50%;
-  background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.2);
-  color:white;font-size:22px;cursor:pointer;
+  width:64px;height:64px;border-radius:50%;
+  background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);
+  color:white;font-size:28px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  transition:all .12s;
+  transition:all .12s;flex-shrink:0;
 }
-.vnav-btn:hover{background:rgba(255,255,255,0.28)}
-.vnav-btn:disabled{opacity:.25;cursor:default}
-.vnav-counter{color:rgba(255,255,255,0.7);font-size:14px;min-width:64px;text-align:center}
+.vnav-btn:hover,.vnav-btn:focus{background:rgba(255,255,255,0.35);outline:none}
+.vnav-btn:disabled{opacity:.2;cursor:default}
+.vnav-btn.big{width:80px;height:80px;font-size:36px;background:rgba(255,255,255,0.2);border-color:rgba(255,255,255,0.5)}
+.vnav-btn.big:hover,.vnav-btn.big:focus{background:rgba(255,255,255,0.4)}
+.vnav-counter{color:rgba(255,255,255,0.85);font-size:16px;font-weight:600;min-width:80px;text-align:center}
+.vnav-sep{width:1px;height:40px;background:rgba(255,255,255,0.2);margin:0 4px}
+.pdf-page-nav{display:flex;align-items:center;gap:8px}
+.pdf-page-label{color:rgba(255,255,255,0.7);font-size:13px;white-space:nowrap}
 
 /* === SETUP MODAL === */
 .setup-overlay{
@@ -273,6 +279,25 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 @media(max-width:640px){
   .sidebar{display:none}
   .items-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+}
+@media(min-width:1200px){
+  .item-card{padding:1.75rem 1.25rem}
+  .item-icon{font-size:64px!important}
+  .item-name{font-size:15px}
+  .vnav-btn{width:72px;height:72px;font-size:32px}
+  .vnav-btn.big{width:90px;height:90px;font-size:42px}
+  .viewer-topbar{height:68px;padding:0 1.5rem}
+  .btn-learned{padding:10px 22px;font-size:15px}
+}
+/* TV / large screen optimizations */
+@media(min-width:1200px){
+  .item-card{padding:1.75rem 1.25rem}
+  .item-icon{font-size:64px!important}
+  .item-name{font-size:15px}
+  .vnav-btn{width:72px;height:72px;font-size:32px}
+  .vnav-btn.big{width:90px;height:90px;font-size:42px}
+  .viewer-topbar{height:68px;padding:0 1.5rem}
+  .btn-learned{padding:10px 22px;font-size:15px}
 }
 </style>
 </head>
@@ -351,15 +376,27 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
   <div class="viewer-topbar">
     <button class="viewer-close" onclick="closeViewer()">✕</button>
     <div class="viewer-title" id="viewerTitle"></div>
-    <button class="btn-learned undone" id="btnLearn" onclick="toggleLearned()">☆ Đánh dấu đã học</button>
+    <button class="btn-learned undone" id="btnLearn" onclick="toggleLearned()">☆ Đã học</button>
+    <button class="viewer-close" onclick="toggleFullscreen()" id="btnFS" title="Toàn màn hình" style="margin-left:4px;font-size:16px">⛶</button>
   </div>
   <div class="viewer-body" id="viewerBody">
     <div class="viewer-loading"><div class="spinner"></div><span>Đang tải...</span></div>
   </div>
   <div class="viewer-nav" id="viewerNav" style="display:none">
-    <button class="vnav-btn" id="vPrev" onclick="viewerPrev()">‹</button>
+    <!-- File navigation -->
+    <button class="vnav-btn big" id="vPrev" onclick="viewerPrev()" title="File trước">⟨</button>
     <span class="vnav-counter" id="vCounter"></span>
-    <button class="vnav-btn" id="vNext" onclick="viewerNext()">›</button>
+    <button class="vnav-btn big" id="vNext" onclick="viewerNext()" title="File tiếp">⟩</button>
+    <div class="vnav-sep"></div>
+    <!-- PDF page navigation -->
+    <div class="pdf-page-nav" id="pdfPageNav" style="display:none">
+      <button class="vnav-btn" id="pPrev" onclick="pdfPagePrev()" title="Trang trước">↑</button>
+      <span class="pdf-page-label">Trang <span id="pCounter">1</span></span>
+      <button class="vnav-btn" id="pNext" onclick="pdfPageNext()" title="Trang tiếp">↓</button>
+    </div>
+    <div class="vnav-sep" id="pdfSep" style="display:none"></div>
+    <!-- Fullscreen -->
+    <button class="vnav-btn" onclick="toggleFullscreen()" title="Toàn màn hình" style="font-size:22px">⛶</button>
   </div>
 </div>
 
@@ -639,41 +676,51 @@ function openViewer(idx) {
   document.getElementById('viewerTitle').textContent = f.name;
   updateLearnBtn(f.id);
 
-  // Nav
+  // File nav - always show
   const nav = document.getElementById('viewerNav');
-  if (currentFileList.length > 1) {
-    nav.style.display = 'flex';
-    document.getElementById('vPrev').disabled = idx === 0;
-    document.getElementById('vNext').disabled = idx === currentFileList.length - 1;
-    document.getElementById('vCounter').textContent = `${idx + 1} / ${currentFileList.length}`;
-  } else {
-    nav.style.display = 'none';
-  }
+  nav.style.display = 'flex';
+  document.getElementById('vPrev').disabled = idx === 0;
+  document.getElementById('vNext').disabled = idx === currentFileList.length - 1;
+  document.getElementById('vCounter').textContent = `${idx + 1} / ${currentFileList.length}`;
+
+  // Hide PDF page nav until PDF loads
+  document.getElementById('pdfPageNav').style.display = 'none';
+  document.getElementById('pdfSep').style.display = 'none';
 
   loadViewerContent(f);
 }
 
+let currentPdfPage = 1;
+let currentPdfIframe = null;
+
 function loadViewerContent(f) {
   const body = document.getElementById('viewerBody');
   body.innerHTML = `<div class="viewer-loading"><div class="spinner"></div><span>Đang tải...</span></div>`;
+  currentPdfIframe = null;
+  currentPdfPage = 1;
 
   if (f.mimeType === PDF_TYPE) {
-    // Use Drive preview iframe
-    const fileId = f.id;
     const iframe = document.createElement('iframe');
-    iframe.src = `https://drive.google.com/file/d/${fileId}/preview`;
+    iframe.src = `https://drive.google.com/file/d/${f.id}/preview`;
     iframe.allow = 'autoplay';
-    iframe.onload = () => {};
+    iframe.style.cssText = 'width:100%;height:100%;border:none;';
+    iframe.onload = () => {
+      // Show PDF page nav
+      document.getElementById('pdfPageNav').style.display = 'flex';
+      document.getElementById('pdfSep').style.display = 'block';
+      document.getElementById('pCounter').textContent = currentPdfPage;
+      document.getElementById('pPrev').disabled = true;
+      document.getElementById('pNext').disabled = false;
+    };
+    currentPdfIframe = iframe;
     body.innerHTML = '';
     body.appendChild(iframe);
   } else if (IMG_TYPES.includes(f.mimeType)) {
     const img = document.createElement('img');
-    // Use direct Drive link
     img.src = `https://drive.google.com/uc?export=view&id=${f.id}`;
     img.alt = f.name;
     img.onload = () => { body.innerHTML = ''; body.appendChild(img); };
     img.onerror = () => {
-      // Fallback: thumbnail
       if (f.thumbnailLink) {
         img.src = f.thumbnailLink.replace('=s220','=s1600');
       } else {
@@ -682,6 +729,36 @@ function loadViewerContent(f) {
     };
   } else {
     body.innerHTML = `<div class="viewer-loading"><span>Định dạng không hỗ trợ</span></div>`;
+  }
+}
+
+function pdfPagePrev() {
+  if (currentPdfPage <= 1 || !currentPdfIframe) return;
+  currentPdfPage--;
+  document.getElementById('pCounter').textContent = currentPdfPage;
+  document.getElementById('pPrev').disabled = currentPdfPage <= 1;
+  document.getElementById('pNext').disabled = false;
+  // Reload iframe with page anchor
+  const base = currentPdfIframe.src.split('#')[0].split('&page=')[0];
+  currentPdfIframe.src = base + '&page=' + currentPdfPage;
+}
+
+function pdfPageNext() {
+  if (!currentPdfIframe) return;
+  currentPdfPage++;
+  document.getElementById('pCounter').textContent = currentPdfPage;
+  document.getElementById('pPrev').disabled = false;
+  currentPdfIframe.src = currentPdfIframe.src.split('#')[0].split('&page=')[0] + '&page=' + currentPdfPage;
+}
+
+function toggleFullscreen() {
+  const el = document.getElementById('viewerOverlay');
+  if (!document.fullscreenElement) {
+    el.requestFullscreen().catch(()=>{});
+    document.getElementById('btnFS').textContent = '✕⛶';
+  } else {
+    document.exitFullscreen();
+    document.getElementById('btnFS').textContent = '⛶';
   }
 }
 
