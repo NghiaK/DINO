@@ -233,6 +233,26 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
   transition:all .12s;flex-shrink:0;
 }
 .vnav-btn:hover,.vnav-btn:focus{background:rgba(255,255,255,0.35);outline:none}
+/* === TV REMOTE FOCUS STYLES === */
+[data-focusable]:focus{
+  outline:none;
+}
+[data-focusable].tv-focus{
+  outline:none;
+  box-shadow:0 0 0 4px #FFB830, 0 0 0 8px rgba(255,184,48,0.35)!important;
+  transform:scale(1.04);
+  z-index:5;
+  position:relative;
+}
+.item-card.tv-focus{border-color:#FFB830!important}
+.group-card.tv-focus{border-color:#FFB830!important}
+.tree-item.tv-focus{background:#FEF3C7!important;border-left-color:#FFB830!important}
+.vnav-btn.tv-focus{background:rgba(255,184,48,0.4)!important;border-color:#FFB830!important}
+.viewer-close.tv-focus{background:rgba(255,184,48,0.4)!important}
+.btn-learned.tv-focus{box-shadow:0 0 0 4px #FFB830!important}
+.topbar-btn.tv-focus{border-color:#FFB830!important;background:#FEF3C7!important}
+.filter-btn.tv-focus{border-color:#FFB830!important}
+.breadcrumb-item.tv-focus{background:#FEF3C7!important}
 .vnav-btn:disabled{opacity:.2;cursor:default}
 .vnav-btn.big{width:80px;height:80px;font-size:36px;background:rgba(255,255,255,0.2);border-color:rgba(255,255,255,0.5)}
 .vnav-btn.big:hover,.vnav-btn.big:focus{background:rgba(255,255,255,0.4)}
@@ -300,6 +320,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
   .btn-learned{padding:10px 22px;font-size:15px}
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
 
@@ -328,7 +349,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
       </div>
     </div>
     <div class="setup-foot">
-      <button class="btn-go" id="btnSetup" onclick="doSetup()">Bắt đầu →</button>
+      <button class="btn-go" id="btnSetup" data-focusable="true" onclick="doSetup()">Bắt đầu →</button>
     </div>
   </div>
 </div>
@@ -339,8 +360,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
     <div class="topbar-logo"><span>📚</span> Bé Học Vui</div>
     <div class="breadcrumb" id="breadcrumb"></div>
     <div class="topbar-sep"></div>
-    <button class="topbar-btn" onclick="openSetup()">⚙️ Cài đặt</button>
-    <button class="topbar-btn" id="btnReset" onclick="resetProgress()">🗑 Xoá tiến độ</button>
+    <button class="topbar-btn" data-focusable="true" onclick="openSetup()">⚙️ Cài đặt</button>
+    <button class="topbar-btn" id="btnReset" data-focusable="true" onclick="resetProgress()">🗑 Xoá tiến độ</button>
   </div>
   <div class="main">
     <!-- SIDEBAR -->
@@ -374,33 +395,36 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 <!-- VIEWER -->
 <div class="viewer-overlay" id="viewerOverlay">
   <div class="viewer-topbar">
-    <button class="viewer-close" onclick="closeViewer()">✕</button>
+    <button class="viewer-close" data-focusable="true" onclick="closeViewer()">✕</button>
     <div class="viewer-title" id="viewerTitle"></div>
-    <button class="btn-learned undone" id="btnLearn" onclick="toggleLearned()">☆ Đã học</button>
-    <button class="viewer-close" onclick="toggleFullscreen()" id="btnFS" title="Toàn màn hình" style="margin-left:4px;font-size:16px">⛶</button>
+    <button class="btn-learned undone" id="btnLearn" data-focusable="true" onclick="toggleLearned()">☆ Đã học</button>
+    <button class="viewer-close" data-focusable="true" onclick="toggleFullscreen()" id="btnFS" title="Toàn màn hình" style="margin-left:4px;font-size:16px">⛶</button>
   </div>
   <div class="viewer-body" id="viewerBody">
     <div class="viewer-loading"><div class="spinner"></div><span>Đang tải...</span></div>
   </div>
   <div class="viewer-nav" id="viewerNav" style="display:none">
     <!-- File navigation -->
-    <button class="vnav-btn big" id="vPrev" onclick="viewerPrev()" title="File trước">⟨</button>
+    <button class="vnav-btn big" id="vPrev" data-focusable="true" onclick="viewerPrev()" title="File trước">⟨</button>
     <span class="vnav-counter" id="vCounter"></span>
-    <button class="vnav-btn big" id="vNext" onclick="viewerNext()" title="File tiếp">⟩</button>
+    <button class="vnav-btn big" id="vNext" data-focusable="true" onclick="viewerNext()" title="File tiếp">⟩</button>
     <div class="vnav-sep"></div>
     <!-- PDF page navigation -->
     <div class="pdf-page-nav" id="pdfPageNav" style="display:none">
-      <button class="vnav-btn" id="pPrev" onclick="pdfPagePrev()" title="Trang trước">↑</button>
-      <span class="pdf-page-label">Trang <span id="pCounter">1</span></span>
-      <button class="vnav-btn" id="pNext" onclick="pdfPageNext()" title="Trang tiếp">↓</button>
+      <button class="vnav-btn" id="pPrev" data-focusable="true" onclick="pdfPagePrev()" title="Trang trước">↑</button>
+      <span class="pdf-page-label" id="pCounter">1 / ?</span>
+      <button class="vnav-btn" id="pNext" data-focusable="true" onclick="pdfPageNext()" title="Trang tiếp">↓</button>
     </div>
     <div class="vnav-sep" id="pdfSep" style="display:none"></div>
     <!-- Fullscreen -->
-    <button class="vnav-btn" onclick="toggleFullscreen()" title="Toàn màn hình" style="font-size:22px">⛶</button>
+    <button class="vnav-btn" data-focusable="true" onclick="toggleFullscreen()" title="Toàn màn hình" style="font-size:22px">⛶</button>
   </div>
 </div>
 
 <script>
+// Configure pdf.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
 // ============================================================
 // STATE
 // ============================================================
@@ -531,7 +555,7 @@ function renderBreadcrumb() {
   bc.innerHTML = folderStack.map((f, i) => {
     const isLast = i === folderStack.length - 1;
     return (i > 0 ? `<span class="breadcrumb-sep">›</span>` : '') +
-      `<span class="breadcrumb-item ${isLast ? 'current' : ''}" onclick="${isLast ? '' : `navigateBreadcrumb(${i})`}">${f.name}</span>`;
+      `<span class="breadcrumb-item ${isLast ? 'current' : ''}" ${isLast ? '' : 'data-focusable="true"'} onclick="${isLast ? '' : `navigateBreadcrumb(${i})`}">${f.name}</span>`;
   }).join('');
 }
 
@@ -557,22 +581,24 @@ function renderContent(items) {
 
   let html = `
     <div class="filter-bar">
-      <button class="filter-btn ${currentFilter==='all'?'active':''}" onclick="setFilter('all')">Tất cả</button>
-      <button class="filter-btn green ${currentFilter==='learned'?'active':''}" onclick="setFilter('learned')">✓ Đã học</button>
-      <button class="filter-btn coral ${currentFilter==='unlearned'?'active':''}" onclick="setFilter('unlearned')">○ Chưa học</button>
+      <button class="filter-btn ${currentFilter==='all'?'active':''}" data-focusable="true" onclick="setFilter('all')">Tất cả</button>
+      <button class="filter-btn green ${currentFilter==='learned'?'active':''}" data-focusable="true" onclick="setFilter('learned')">✓ Đã học</button>
+      <button class="filter-btn coral ${currentFilter==='unlearned'?'active':''}" data-focusable="true" onclick="setFilter('unlearned')">○ Chưa học</button>
       <input class="search-input" placeholder="🔍 Tìm kiếm..." value="${searchQuery}" oninput="setSearch(this.value)">
     </div>
   `;
 
   if (!filtered.length) {
     html += `<div class="empty-content"><div class="icon">🔍</div><p>Không có kết quả phù hợp.</p></div>`;
-    area.innerHTML = html; return;
+    area.innerHTML = html;
+    autoFocusAfterRender();
+    return;
   }
 
   if (folders.length) {
     html += `<div class="section-label">📁 Thư mục (${folders.length})</div><div class="items-grid">`;
     html += folders.map(f => `
-      <div class="item-card folder" onclick="navigateTo('${f.id}','${escHtml(f.name)}')">
+      <div class="item-card folder" data-focusable="true" onclick="navigateTo('${f.id}','${escHtml(f.name)}')">
         <div class="item-icon">📁</div>
         <div class="item-name">${escHtml(f.name)}</div>
       </div>
@@ -587,7 +613,7 @@ function renderContent(items) {
       const icon = getIcon(f.mimeType);
       const thumb = f.thumbnailLink ? f.thumbnailLink.replace('=s220','=s400') : '';
       return `
-        <div class="item-card ${isLearned ? 'is-learned' : ''}" onclick="openFile('${f.id}')">
+        <div class="item-card ${isLearned ? 'is-learned' : ''}" data-focusable="true" onclick="openFile('${f.id}')">
           <div class="item-icon">${thumb ? `<img src="${thumb}" style="width:64px;height:64px;object-fit:cover;border-radius:8px" onerror="this.outerHTML='${icon}'" alt="">` : icon}</div>
           <div class="item-name">${escHtml(f.name)}</div>
           <div class="item-meta">${f.mimeType === PDF_TYPE ? 'PDF' : 'Ảnh'}</div>
@@ -598,6 +624,7 @@ function renderContent(items) {
   }
 
   area.innerHTML = html;
+  autoFocusAfterRender();
 }
 
 function setFilter(f) { currentFilter = f; renderContent(currentItems); }
@@ -613,14 +640,14 @@ function renderSidebar(items) {
 
   let html = '';
   folders.forEach(f => {
-    html += `<div class="tree-item" onclick="navigateTo('${f.id}','${escHtml(f.name)}')">
+    html += `<div class="tree-item" data-focusable="true" onclick="navigateTo('${f.id}','${escHtml(f.name)}')">
       <span class="tree-icon">📁</span>
       <span class="tree-name">${escHtml(f.name)}</span>
     </div>`;
   });
   files.forEach(f => {
     const lk = learned[f.id] ? 'learned' : '';
-    html += `<div class="tree-item ${lk}" onclick="openFile('${f.id}')">
+    html += `<div class="tree-item ${lk}" data-focusable="true" onclick="openFile('${f.id}')">
       <span class="tree-icon">${getIcon(f.mimeType)}</span>
       <span class="tree-name">${escHtml(f.name)}</span>
     </div>`;
@@ -688,67 +715,130 @@ function openViewer(idx) {
   document.getElementById('pdfSep').style.display = 'none';
 
   loadViewerContent(f);
+  autoFocusAfterRender();
 }
 
+// PDF.js state
 let currentPdfPage = 1;
-let currentPdfIframe = null;
+let currentPdfTotal = 1;
+let currentPdfDoc = null;
+let pdfRendering = false;
 
-function loadViewerContent(f) {
+// pdf.js worker configured in <head>
+
+async function loadViewerContent(f) {
   const body = document.getElementById('viewerBody');
   body.innerHTML = `<div class="viewer-loading"><div class="spinner"></div><span>Đang tải...</span></div>`;
-  currentPdfIframe = null;
+  currentPdfDoc = null;
   currentPdfPage = 1;
+  currentPdfTotal = 1;
+  document.getElementById('pdfPageNav').style.display = 'none';
+  document.getElementById('pdfSep').style.display = 'none';
 
   if (f.mimeType === PDF_TYPE) {
-    const iframe = document.createElement('iframe');
-    iframe.src = `https://drive.google.com/file/d/${f.id}/preview`;
-    iframe.allow = 'autoplay';
-    iframe.style.cssText = 'width:100%;height:100%;border:none;';
-    iframe.onload = () => {
-      // Show PDF page nav
-      document.getElementById('pdfPageNav').style.display = 'flex';
-      document.getElementById('pdfSep').style.display = 'block';
-      document.getElementById('pCounter').textContent = currentPdfPage;
-      document.getElementById('pPrev').disabled = true;
-      document.getElementById('pNext').disabled = false;
-    };
-    currentPdfIframe = iframe;
-    body.innerHTML = '';
-    body.appendChild(iframe);
+    await loadPdf(f);
   } else if (IMG_TYPES.includes(f.mimeType)) {
-    const img = document.createElement('img');
-    img.src = `https://drive.google.com/uc?export=view&id=${f.id}`;
-    img.alt = f.name;
-    img.onload = () => { body.innerHTML = ''; body.appendChild(img); };
-    img.onerror = () => {
-      if (f.thumbnailLink) {
-        img.src = f.thumbnailLink.replace('=s220','=s1600');
-      } else {
-        body.innerHTML = `<div class="viewer-loading"><span style="font-size:48px">🖼️</span><span>Không tải được ảnh.<br>Kiểm tra quyền chia sẻ.</span></div>`;
-      }
-    };
+    loadImage(f);
   } else {
     body.innerHTML = `<div class="viewer-loading"><span>Định dạng không hỗ trợ</span></div>`;
   }
 }
 
-function pdfPagePrev() {
-  if (currentPdfPage <= 1 || !currentPdfIframe) return;
-  currentPdfPage--;
-  document.getElementById('pCounter').textContent = currentPdfPage;
-  document.getElementById('pPrev').disabled = currentPdfPage <= 1;
-  document.getElementById('pNext').disabled = false;
-  // Reload iframe with page anchor
-  const base = currentPdfIframe.src.split('#')[0].split('&page=')[0];
-  currentPdfIframe.src = base + '&page=' + currentPdfPage;
+async function loadPdf(f) {
+  const body = document.getElementById('viewerBody');
+  // Fetch PDF via Drive export URL
+  const pdfUrl = `https://drive.google.com/uc?export=download&id=${f.id}`;
+  try {
+    const loadingTask = pdfjsLib.getDocument({
+      url: pdfUrl,
+      withCredentials: false,
+    });
+    currentPdfDoc = await loadingTask.promise;
+    currentPdfTotal = currentPdfDoc.numPages;
+    currentPdfPage = 1;
+
+    // Setup canvas
+    body.innerHTML = '<canvas id="pdfCanvas" style="max-width:100%;max-height:100%;object-fit:contain;display:block;"></canvas>';
+
+    // Show page nav
+    document.getElementById('pdfPageNav').style.display = 'flex';
+    document.getElementById('pdfSep').style.display = 'block';
+
+    await renderPdfPage(currentPdfPage);
+  } catch(e) {
+    console.error('PDF load error:', e);
+    // Fallback to iframe embed
+    body.innerHTML = '';
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://drive.google.com/file/d/${f.id}/preview`;
+    iframe.style.cssText = 'width:100%;height:100%;border:none;';
+    body.appendChild(iframe);
+    body.innerHTML += '';
+    // Show simple note
+    const note = document.createElement('div');
+    note.style.cssText = 'position:absolute;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.6);color:white;padding:6px 14px;border-radius:99px;font-size:13px;white-space:nowrap;';
+    note.textContent = 'Dùng cuộn chuột để chuyển trang PDF';
+    body.appendChild(note);
+  }
 }
 
-function pdfPageNext() {
-  if (!currentPdfIframe) return;
+async function renderPdfPage(pageNum) {
+  if (!currentPdfDoc || pdfRendering) return;
+  pdfRendering = true;
+
+  const canvas = document.getElementById('pdfCanvas');
+  if (!canvas) { pdfRendering = false; return; }
+
+  const page = await currentPdfDoc.getPage(pageNum);
+  const body = document.getElementById('viewerBody');
+  const vw = body.clientWidth || window.innerWidth;
+  const vh = body.clientHeight || window.innerHeight;
+
+  const viewport0 = page.getViewport({ scale: 1 });
+  const scaleW = vw / viewport0.width;
+  const scaleH = vh / viewport0.height;
+  const scale = Math.min(scaleW, scaleH) * 0.97;
+  const viewport = page.getViewport({ scale });
+
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+
+  const ctx = canvas.getContext('2d');
+  await page.render({ canvasContext: ctx, viewport }).promise;
+
+  // Update nav
+  document.getElementById('pCounter').textContent = currentPdfPage + ' / ' + currentPdfTotal;
+  document.getElementById('pPrev').disabled = currentPdfPage <= 1;
+  document.getElementById('pNext').disabled = currentPdfPage >= currentPdfTotal;
+
+  pdfRendering = false;
+}
+
+async function pdfPagePrev() {
+  if (currentPdfPage <= 1 || !currentPdfDoc || pdfRendering) return;
+  currentPdfPage--;
+  await renderPdfPage(currentPdfPage);
+}
+
+async function pdfPageNext() {
+  if (currentPdfPage >= currentPdfTotal || !currentPdfDoc || pdfRendering) return;
   currentPdfPage++;
-  document.getElementById('pCounter').textContent = currentPdfPage;
-  document.getElementById('pPrev').disabled = false;
-  currentPdfIframe.src = currentPdfIframe.src.split('#')[0].split('&page=')[0] + '&page=' + currentPdfPage;
+  await renderPdfPage(currentPdfPage);
+}
+
+function loadImage(f) {
+  const body = document.getElementById('viewerBody');
+  const img = document.createElement('img');
+  img.src = `https://drive.google.com/uc?export=view&id=${f.id}`;
+  img.alt = f.name;
+  img.onload = () => { body.innerHTML = ''; body.appendChild(img); };
+  img.onerror = () => {
+    if (f.thumbnailLink) {
+      img.src = f.thumbnailLink.replace('=s220','=s1600');
+    } else {
+      body.innerHTML = `<div class="viewer-loading"><span style="font-size:48px">🖼️</span><span>Không tải được ảnh.<br>Kiểm tra quyền chia sẻ.</span></div>`;
+    }
+  };
 }
 
 function toggleFullscreen() {
@@ -798,15 +888,122 @@ function updateLearnBtn(fileId) {
 }
 
 // ============================================================
-// KEYBOARD
+// TV REMOTE — SPATIAL NAVIGATION
 // ============================================================
+// Mọi phần tử có thể bấm phải có data-focusable="true".
+// D-pad (mũi tên) tự tìm phần tử gần nhất theo hướng bấm.
+// Enter/OK = click. Escape/Back = quay lại / đóng.
+
+let tvFocusEl = null;
+
+function getFocusables() {
+  // Chỉ lấy phần tử đang hiển thị (visible) trong DOM
+  return Array.from(document.querySelectorAll('[data-focusable]')).filter(el => {
+    if (el.disabled) return false;
+    const rect = el.getBoundingClientRect();
+    if (rect.width === 0 && rect.height === 0) return false;
+    // Phải nằm trong overlay đang mở (nếu có overlay mở)
+    const viewerOpen = document.getElementById('viewerOverlay').classList.contains('open');
+    if (viewerOpen && !el.closest('#viewerOverlay')) return false;
+    if (!viewerOpen && el.closest('#viewerOverlay')) return false;
+    return true;
+  });
+}
+
+function setTvFocus(el) {
+  if (!el) return;
+  if (tvFocusEl) tvFocusEl.classList.remove('tv-focus');
+  tvFocusEl = el;
+  el.classList.add('tv-focus');
+  el.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+}
+
+function tvFocusFirst() {
+  const list = getFocusables();
+  if (list.length) setTvFocus(list[0]);
+}
+
+function moveTvFocus(direction) {
+  const list = getFocusables();
+  if (!list.length) return;
+  if (!tvFocusEl || !list.includes(tvFocusEl)) {
+    setTvFocus(list[0]);
+    return;
+  }
+
+  const cur = tvFocusEl.getBoundingClientRect();
+  const curCenter = { x: cur.left + cur.width / 2, y: cur.top + cur.height / 2 };
+
+  let best = null;
+  let bestScore = Infinity;
+
+  for (const el of list) {
+    if (el === tvFocusEl) continue;
+    const r = el.getBoundingClientRect();
+    const center = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    const dx = center.x - curCenter.x;
+    const dy = center.y - curCenter.y;
+
+    let valid = false, primary = 0, secondary = 0;
+    if (direction === 'right' && dx > 4) { valid = true; primary = dx; secondary = Math.abs(dy); }
+    if (direction === 'left' && dx < -4) { valid = true; primary = -dx; secondary = Math.abs(dy); }
+    if (direction === 'down' && dy > 4) { valid = true; primary = dy; secondary = Math.abs(dx); }
+    if (direction === 'up' && dy < -4) { valid = true; primary = -dy; secondary = Math.abs(dx); }
+    if (!valid) continue;
+
+    // Ưu tiên phần tử thẳng hàng (secondary nhỏ), rồi mới đến khoảng cách primary
+    const score = primary + secondary * 2.2;
+    if (score < bestScore) { bestScore = score; best = el; }
+  }
+
+  if (best) setTvFocus(best);
+}
+
+function activateTvFocus() {
+  if (!tvFocusEl) return;
+  tvFocusEl.click();
+}
+
 document.addEventListener('keydown', e => {
-  if (!document.getElementById('viewerOverlay').classList.contains('open')) return;
-  if (e.key === 'ArrowRight') viewerNext();
-  if (e.key === 'ArrowLeft') viewerPrev();
-  if (e.key === 'Escape') closeViewer();
-  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleLearned(); }
+  const viewerOpen = document.getElementById('viewerOverlay').classList.contains('open');
+
+  // Phím tắt riêng cho viewer (giữ tương thích cũ)
+  if (viewerOpen) {
+    if (e.key === 'Escape' || e.key === 'Backspace') { e.preventDefault(); closeViewer(); return; }
+  }
+
+  switch (e.key) {
+    case 'ArrowUp':
+      e.preventDefault(); moveTvFocus('up'); break;
+    case 'ArrowDown':
+      e.preventDefault(); moveTvFocus('down'); break;
+    case 'ArrowLeft':
+      e.preventDefault(); moveTvFocus('left'); break;
+    case 'ArrowRight':
+      e.preventDefault(); moveTvFocus('right'); break;
+    case 'Enter':
+    case ' ':
+      e.preventDefault(); activateTvFocus(); break;
+    case 'Escape':
+    case 'Backspace':
+      if (!viewerOpen) {
+        // Quay lại thư mục cha nếu có
+        if (folderStack.length > 1) {
+          e.preventDefault();
+          navigateBreadcrumb(folderStack.length - 2);
+        }
+      }
+      break;
+  }
 });
+
+// Tự động focus phần tử đầu tiên sau mỗi lần render nội dung
+function autoFocusAfterRender() {
+  requestAnimationFrame(() => {
+    tvFocusEl = null;
+    tvFocusFirst();
+  });
+}
 
 // ============================================================
 // UTILS
